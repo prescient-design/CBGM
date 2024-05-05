@@ -1,0 +1,27 @@
+dataset:
+  name: color_mnist
+  transforms_1: (0.5)
+  transforms_2: (0.5)
+  img_size: 28
+  batch_size: 64
+  test_batch_size: 1000
+  num_channels: 3
+model:
+  type: gan
+  latent_noise_dim: 64  
+  has_concepts: False
+train_config:
+  epochs: 50
+  gen_lr: 0.001
+  dis_lr: 0.0002
+  betas: (.5, .99)
+  save_model: True
+  use_cuda: True
+  log_interval: 100
+  plot_loss: True
+evaluation:
+  generation: True
+  save_images: True
+  save_concept_image: False
+  score_concepts: False
+  save_results: True

@@ -1,0 +1,36 @@
+dataset:
+  name: color_mnist
+  transforms_1: (0.5)
+  transforms_2: (0.5)
+  img_size: 28
+  batch_size: 64
+  test_batch_size: 1000
+  num_channels: 3
+model:
+  type: cbgan
+  latent_noise_dim: 64
+  input_latent_dim: 10
+  has_concepts: True
+  concepts: 
+      concept_bins: [10,2,2]
+      concept_names: ["label","red","green"]
+      concept_latent: [10,10,10]
+      emb_size: 16
+      concept_output: [10,1,1]
+      types: ["cat", "bin","bin" ]
+
+train_config:
+  epochs: 50
+  gen_lr: 0.0002
+  dis_lr: 0.0002
+  betas: (.5, .99)
+  save_model: True
+  use_cuda: True
+  log_interval: 100
+  plot_loss: True
+evaluation:
+  generation: True
+  save_images: True
+  save_concept_image: True
+  save_results: True
+
