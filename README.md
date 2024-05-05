@@ -1,6 +1,6 @@
 # Concept Bottleneck Generative models
 
-This is the official open source repository for [Concept Bottleneck Generative Models] (https://openreview.net/pdf?id=L9U5MJJleF) 
+This is the official open source repository for [Concept Bottleneck Generative Models](https://openreview.net/pdf?id=L9U5MJJleF) 
 
 
 ## Installation
