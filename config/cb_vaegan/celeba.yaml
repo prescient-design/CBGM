@@ -1,0 +1,37 @@
+dataset:
+  name: celeba
+  transforms_1: (0.5)
+  transforms_2: (0.5)
+  img_size: 64
+  batch_size: 512
+  test_batch_size: 1000
+  num_channels: 3
+  num_concepts: 8
+model:
+  type: cb_vaegan
+  latent_noise_dim: 256 
+  input_latent_dim: 64
+  pre_concept_latent_dim: 256
+  pre_concept_layers: 1
+  has_concepts: True
+  concepts: 
+      emb_size: 32
+      concept_output: [1,1,1,1,1,1,1,1]
+      concept_bins:   [2,2,2,2,2,2,2,2]
+      concept_names: ["Attractive","Heavy_Makeup","High_Cheekbones","Male","Mouth_Slightly_Open","Smiling","Wavy_Hair","Wearing_Lipstick"]
+      types: ["bin","bin","bin","bin","bin","bin","bin","bin" ]
+      concept_latent: [64,64,64,64,64,64,64,64]
+      concept_hidden: [124,124,124,124,124,124,124,124]
+train_config:
+  epochs: 60
+  gen_lr: 0.0006
+  dis_lr: 0.0002
+  betas: (0.5, 0.999)
+  save_model: True
+  use_cuda: True
+  log_interval: 100
+  plot_loss: True
+evaluation:
+  generation: True
+  save_images: True
+  save_results: True
