@@ -11,7 +11,7 @@ model:
   pre_concept_latent_dim: 124
   pre_concept_layers: 5
   has_concepts: True
-  concepts: 
+  concepts:
       emb_size: 16
       concept_names: ["label","red","green"]
       types: ["cat", "bin","bin" ]

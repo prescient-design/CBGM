@@ -9,7 +9,7 @@ dataset:
   num_concepts: 8
 model:
   type: vaegan
-  latent_noise_dim: 128 
+  latent_noise_dim: 128
   input_latent_dim: None
   has_concepts: False
 train_config:

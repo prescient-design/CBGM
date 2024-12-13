@@ -8,7 +8,7 @@ dataset:
   num_channels: 3
 model:
   type: vaegan
-  latent_noise_dim: 64  
+  latent_noise_dim: 64
   has_concepts: False
 train_config:
   epochs: 50
