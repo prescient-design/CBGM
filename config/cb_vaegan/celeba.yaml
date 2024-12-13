@@ -3,19 +3,19 @@ dataset:
   transforms_1: (0.5)
   transforms_2: (0.5)
   img_size: 64
-  batch_size: 512
-  test_batch_size: 1000
+  batch_size: 128
+  test_batch_size: 2000
   num_channels: 3
   num_concepts: 8
 model:
   type: cb_vaegan
-  latent_noise_dim: 256 
+  latent_noise_dim: 128 
   input_latent_dim: 64
-  pre_concept_latent_dim: 256
+  pre_concept_latent_dim: 128
   pre_concept_layers: 1
   has_concepts: True
   concepts: 
-      emb_size: 32
+      emb_size: 16
       concept_output: [1,1,1,1,1,1,1,1]
       concept_bins:   [2,2,2,2,2,2,2,2]
       concept_names: ["Attractive","Heavy_Makeup","High_Cheekbones","Male","Mouth_Slightly_Open","Smiling","Wavy_Hair","Wearing_Lipstick"]
@@ -23,15 +23,17 @@ model:
       concept_latent: [64,64,64,64,64,64,64,64]
       concept_hidden: [124,124,124,124,124,124,124,124]
 train_config:
-  epochs: 60
-  gen_lr: 0.0006
+  epochs: 200
+  gen_lr: 0.0001
   dis_lr: 0.0002
+  dec_concept_lr:  0.0001
   betas: (0.5, 0.999)
   save_model: True
   use_cuda: True
   log_interval: 100
   plot_loss: True
 evaluation:
+  score_concepts: False
   generation: True
   save_images: True
   save_results: True

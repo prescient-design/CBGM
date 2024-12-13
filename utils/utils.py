@@ -47,40 +47,76 @@ def sample_code(num,model, return_list=False) -> torch.Tensor:
 
 
 
-def get_dataset(config,batch_size=None):
+def get_dataset(config,batch_size=None, istesting=False):
     if batch_size==None:
         batch_size=config["dataset"]["batch_size"]
 
-    if(config["dataset"]["name"] =="color_mnist"):
-        ##### Check if exist
 
-        if not (os.path.isfile("./data/color_mnist/train.pt")):
+    if istesting:
+        if(config["dataset"]["name"] =="color_mnist"):
 
-            ###### if not exist create it
-            color_mnist.generate_data()
+            if not (os.path.isfile("./data/color_mnist/train.pt")):
 
-        train_loader = torch.utils.data.DataLoader(
-            color_mnist.ColoredMNIST(root='./data', env='train',
-                     transform=transforms.Compose([transforms.Resize(config["dataset"]["img_size"]),
-                         transforms.ToTensor(),
-                    ])),
-            batch_size=batch_size,
-            shuffle=True)
-    elif(config["dataset"]["name"] =="celeba"):
-        CELEBA_CONFIG = dict(
-        batch_size=config["dataset"]["batch_size"],
-        image_size=config["dataset"]["img_size"],
-        num_classes=1000,
-        num_workers=8,
-        # DATASET VARIABLES
-        use_binary_vector_class=True,
-        num_concepts=config["dataset"]["num_concepts"],
-        label_binary_width=1,
-        label_dataset_subsample=12,
-        num_hidden_concepts=0,
-        selected_concepts=False,
-        )
+                ###### if not exist create it
+                color_mnist.generate_data()
 
-        train_loader = celeba.generate_data(CELEBA_CONFIG,ds_for_generation=True)
+            dl = torch.utils.data.DataLoader(
+                color_mnist.ColoredMNIST(root='./data', env='test',
+                         transform=transforms.Compose([transforms.Resize(config["dataset"]["img_size"]),
+                             transforms.ToTensor(),
+                        ])),
+                batch_size=batch_size,
+                shuffle=True)
 
-    return train_loader 
+
+        elif(config["dataset"]["name"] =="celeba"):
+
+            CELEBA_CONFIG = dict(
+            batch_size=config["dataset"]["test_batch_size"],
+            image_size=config["dataset"]["img_size"],
+            num_classes=1000,
+            num_workers=8,
+            # DATASET VARIABLES
+            use_binary_vector_class=True,
+            num_concepts=config["dataset"]["num_concepts"],
+            label_binary_width=1,
+            label_dataset_subsample=12,
+            num_hidden_concepts=0,
+            selected_concepts=False,
+            )
+
+            _, _, dl, _ =  celeba.generate_data(CELEBA_CONFIG,ds_for_generation=False)
+
+    else:
+        if(config["dataset"]["name"] =="color_mnist"):
+            ##### Check if exist
+
+            if not (os.path.isfile("./data/color_mnist/train.pt")):
+
+                ###### if not exist create it
+                color_mnist.generate_data()
+
+            dl = torch.utils.data.DataLoader(
+                color_mnist.ColoredMNIST(root='./data', env='train',
+                         transform=transforms.Compose([transforms.Resize(config["dataset"]["img_size"]),
+                             transforms.ToTensor(),
+                        ])),
+                batch_size=batch_size,
+                shuffle=True)
+        elif(config["dataset"]["name"] =="celeba"):
+            CELEBA_CONFIG = dict(
+            batch_size=config["dataset"]["batch_size"],
+            image_size=config["dataset"]["img_size"],
+            num_classes=1000,
+            num_workers=8,
+            # DATASET VARIABLES
+            use_binary_vector_class=True,
+            num_concepts=config["dataset"]["num_concepts"],
+            label_binary_width=1,
+            label_dataset_subsample=12,
+            num_hidden_concepts=0,
+            selected_concepts=False,
+            )
+
+            dl =  celeba.generate_data(CELEBA_CONFIG,ds_for_generation=True)
+    return dl

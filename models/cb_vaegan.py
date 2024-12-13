@@ -63,7 +63,7 @@ class CBM_plus_Dec(nn.Module):
 
             self.gen = Generator_Simple(self.g_latent,self.num_channels)
         else:
-            self.gen = Generator(self.g_latent,self.num_channels)
+            self.gen = Generator(self.g_latent)
             self.gen.weight_init(mean=0.0, std=0.02)
 
 
@@ -129,9 +129,8 @@ class cbGAN(Basic):
             self.enc = Encoder(noise_dim=self.noise_dim)
             self.dec = CBM_plus_Dec(self.n_concepts,self.concept_bins,self.emb_size,self.noise_dim,self.concept_type,self.num_channels,self.device,"regular")
             self.dis = Discriminator(self.noise_dim)
+        self.dis.weight_init(mean=0.0, std=0.02)
 
-
-            self.dis.weight_init(mean=0.0, std=0.02)
 
     def sample_noise(self, num: int):
         return sample_noise(num, self.noise_dim, self.device)
@@ -161,7 +160,10 @@ class cbGAN(Basic):
 
     def forward(self, batch_size: int = 1):
         ### generate fake image
-        h = self.sample_latent(batch_size).squeeze(2).squeeze(2)
+        if batch_size==1:
+            h = self.sample_latent(batch_size)
+        else:
+            h = self.sample_latent(batch_size).squeeze(2).squeeze(2)
         fake_data=self.dec(h)
         return fake_data
     

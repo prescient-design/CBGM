@@ -42,7 +42,11 @@ class GAN(Basic):
 
     def forward(self, batch_size: int = 1):
         ### generate fake image
-        h = self.sample_latent(batch_size)
+        if batch_size==1:
+            h = self.sample_latent(batch_size)
+        else:
+            h = self.sample_latent(batch_size).squeeze()
+        h=h.unsqueeze(-1).unsqueeze(-1)
         fake_data=self.dec(h)
         return fake_data
 

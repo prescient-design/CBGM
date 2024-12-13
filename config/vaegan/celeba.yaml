@@ -3,18 +3,18 @@ dataset:
   transforms_1: (0.5)
   transforms_2: (0.5)
   img_size: 64
-  batch_size: 32
-  test_batch_size: 1000
+  batch_size: 128
+  test_batch_size: 2000
   num_channels: 3
   num_concepts: 8
 model:
   type: vaegan
-  latent_noise_dim: 100 
+  latent_noise_dim: 128 
   input_latent_dim: None
   has_concepts: False
 train_config:
-  epochs: 50
-  gen_lr: 0.002
+  epochs: 200
+  gen_lr: 0.0002
   dis_lr: 0.0002
   betas: (0.5, 0.999)
   save_model: True

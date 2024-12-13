@@ -15,12 +15,12 @@ from torch import nn
 from models import cb_vaegan 
 import torchvision.transforms as transforms
 from utils import gan_loss
-import itertools
+from pytorch_gan_metrics import get_inception_score, get_fid
+from torchmetrics.image.fid import FrechetInceptionDistance
 import warnings
-import pickle
+import itertools
 
 warnings.filterwarnings("ignore", category=UserWarning) 
-import time
 
 
 def get_concept_index(model,c):
@@ -98,12 +98,18 @@ def main(config):
 		model.dis.to(device)
 	model.to(device)
 
-	dataloader = get_dataset(config)	
+	test_dl = get_dataset(config,istesting=True)
+	it_tst = iter(test_dl)
+	(imgs_tst, concepts) = next(it_tst)
+	imgs_tst = Variable(imgs_tst.type(FloatTensor))
+	dataloader  = get_dataset(config)
 	gen_opt = torch.optim.Adam(itertools.chain(model.enc.parameters(),model.dec.parameters()), lr=  config["train_config"]["gen_lr"], betas=literal_eval(config["train_config"]["betas"]))
 	dis_opt = torch.optim.Adam(model.dis.parameters(), lr=  config["train_config"]["dis_lr"], betas=literal_eval(config["train_config"]["betas"]))
 	
 	adversarial_loss = torch.nn.MSELoss()
 
+	best_generation_epoch=0
+	best_FID=100000
 
 	if  config["train_config"]["plot_loss"]:
 		generator_loss_value=[]
@@ -112,6 +118,7 @@ def main(config):
 		sens_loss_value=[]
 		orthognality_loss_value=[]
 		prior_loss_value=[]
+		fid_value=[]
 
 
 	for epoch in range(config["train_config"]["epochs"]):
@@ -122,7 +129,6 @@ def main(config):
 		prior_epoch=0
 		orthognality_epoch=0
 		model.train()
-		start = time.time()
 
 		for i, (imgs, concepts) in enumerate(dataloader):
 			if config["dataset"]["name"]=='celeba':
@@ -268,7 +274,27 @@ def main(config):
 
 
 		model.eval()
-				
+		fid = FrechetInceptionDistance(feature=64,normalize=True).to(device)	
+		fid.update(imgs_tst, real=True)
+		fid.update(gen_imgs, real=False)
+		epoch_fid = fid.compute().item()
+		if config["evaluation"]["generation"]:
+			###### check the discriminator's acc
+			num_samples_to_test =100
+
+
+			# Sample noise and labels as generator input
+			latent = model.sample_latent(num_samples_to_test).squeeze()
+			# Generate a batch of images
+			fake_data= model.dec(latent)
+
+			fake_dis_prob, _=model.dis(fake_data.detach(),return_prob=True)
+			fake_dis_acc  =(fake_dis_prob>0.5).long()
+			gen_acc = fake_dis_acc.sum().detach().item()/num_samples_to_test
+			print(
+				"Model %s Dataset %s [Epoch %d/%d] Generation Accuracy %.2f"
+				% (mode_type,dataset,epoch, config["train_config"]["epochs"], gen_acc*100)
+				)
 		if config["evaluation"]["save_images"]:
 			save_image(gen_imgs.data, save_image_loc+"%d.png" % epoch, nrow=8, normalize=True)
 			save_image(real_imgs.data, save_image_loc+"%d_real.png" % epoch, nrow=8, normalize=True)
@@ -276,9 +302,12 @@ def main(config):
 
 
 		if config["train_config"]["save_model"]:
-			torch.save(model.dec.state_dict(), "models/"+save_model_name+".pt")
+			if(best_FID>epoch_fid):
+				print("Saving...")
+				torch.save(model.dec.state_dict(), "generation_checkpoints/"+save_model_name+".pt")
+		if(best_FID>epoch_fid):
+			best_FID=epoch_fid
+			best_generation_epoch=epoch
+		print("FID score %f | best FID %f at epoch %d"% (epoch_fid,best_FID,best_generation_epoch) )
 
-
-		end = time.time()
-		print("epoch time", end - start)
 		print()

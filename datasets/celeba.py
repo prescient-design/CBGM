@@ -317,7 +317,7 @@ def generate_data(config=CELEBA_CONFIG, root='./data', output_dataset_vars=False
         train_dl = torch.utils.data.DataLoader(
             celeba_train_data,
             batch_size=config['batch_size'],
-            shuffle=False,
+            shuffle=True,
             num_workers=config['num_workers'],
         )
         test_dl = torch.utils.data.DataLoader(
@@ -352,7 +352,7 @@ def generate_data(config=CELEBA_CONFIG, root='./data', output_dataset_vars=False
         train_dl = torch.utils.data.DataLoader(
             celeba_train_data,
             batch_size=config['batch_size'],
-            shuffle=False,
+            shuffle=True,
             num_workers=config['num_workers'],
         )
         return train_dl
